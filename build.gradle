@@ -1,0 +1,26 @@
+plugins {
+    id 'org.spongepowered.plugin' version '0.8.1'
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id 'java'
+}
+
+group = 'me.morpheus'
+version = '0.0.1'
+
+dependencies {
+    compile 'org.spongepowered:spongeapi:7.2.0-20190830.205733-27'
+
+    shadow 'it.unimi.dsi:fastutil:8.2.1'
+    compile 'me.lucko.luckperms:luckperms-api:4.4'
+}
+
+shadowJar {
+    baseName = 'shadow'
+    classifier = null
+    version = null
+
+    relocate 'it.unimi', 'shadow.it'
+
+}
+
+sponge.plugin.id = "metropolis"
