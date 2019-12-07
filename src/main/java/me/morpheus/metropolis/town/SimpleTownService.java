@@ -53,11 +53,13 @@ public class SimpleTownService implements TownService {
 
     @Override
     public Optional<Town> create(Text name, Location<World> spawn) {
-        final Town t = new MPTown(this.lastID, TownTypes.SETTLEMENT, name, spawn, Instant.now());
+        final int id = this.lastID;
+        final Town t = new MPTown(id, TownTypes.SETTLEMENT, name, spawn, Instant.now());
         this.lastID++;
-        if (this.towns.put(this.lastID, t) != null) {
+        if (this.towns.containsKey(id)) {
             return Optional.empty();
         }
+        this.towns.put(id, t);
         return Optional.of(t);
     }
 
