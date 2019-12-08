@@ -21,7 +21,7 @@ public final class TownDispatcher extends AbstractCommandDispatcher {
     @Override
     public void registerDefaults() {
         register(new JoinCommand(), "join");
-        register(new LeaveCommand(), "takeover");
+        register(new LeaveCommand(), "leave");
         register(new TakeoverCommand(), "takeover");
     }
 }
