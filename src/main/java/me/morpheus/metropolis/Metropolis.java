@@ -137,6 +137,7 @@ public class Metropolis {
         } catch (Exception e) {
             Sponge.getServiceManager().provideUnchecked(IncidentService.class)
                     .create(new MPIncident(MPGenericErrors.config(), e));
+            return;
         }
         registerCommands();
 
@@ -161,15 +162,18 @@ public class Metropolis {
 
     @Listener
     public void onPostInit(GameAboutToStartServerEvent event) {
-        final IncidentService is = Sponge.getServiceManager().provideUnchecked(IncidentService.class);
-        Incident i = MPreconditions.checkDefaultRanks();
-        if (i != null) {
-            is.create(i);
-        }
+        MPreconditions.checkDefaultRanks();
+        MPreconditions.checkEconomyIntegration();
     }
 
     @Listener
     public void onServerStarting(GameStartingServerEvent event) {
+        final IncidentService is = Sponge.getServiceManager().provideUnchecked(IncidentService.class);
+
+        if (!is.isEmpty()) {
+            return;
+        }
+
         Sponge.getServiceManager().provideUnchecked(PlotService.class)
                 .loadAll()
                 .thenRun(() -> MPLog.getLogger().info("Plots loaded"));
@@ -182,11 +186,9 @@ public class Metropolis {
     @Listener
     public void onServerStarted(GameStartedServerEvent event) {
         final IncidentService is = Sponge.getServiceManager().provideUnchecked(IncidentService.class);
-        final Collection<Incident> incidents = is.getAll();
 
-        if (!incidents.isEmpty()) {
-            Sponge.getEventManager().unregisterPluginListeners(this.container);
-            Sponge.getEventManager().registerListeners(this.container, new WarningLoginHandler());
+        if (!is.isEmpty()) {
+            is.setSafeMode();
 
             MPLog.getLogger().error("{} failed to start", Metropolis.NAME);
 
@@ -214,6 +216,12 @@ public class Metropolis {
 
     @Listener
     public void onServerStopping(GameStoppingServerEvent event) {
+        final IncidentService is = Sponge.getServiceManager().provideUnchecked(IncidentService.class);
+
+        if (!is.isEmpty()) {
+            return;
+        }
+
         Sponge.getServiceManager().provideUnchecked(TownService.class)
                 .saveAll()
                 .thenRun(() -> MPLog.getLogger().info("Towns saved"));
