@@ -54,6 +54,7 @@ class BuyCommand extends AbstractHomeTownCommand {
         pd.set(PlotKeys.OWNER, Optional.of(source.getUniqueId()));
         source.sendMessage(TextUtil.watermark(TextColors.AQUA, "You bought this plot for ", pd.price().get()));
         pd.set(PlotKeys.PRICE, 0.0);
+        pd.set(PlotKeys.FORSALE, false);
 
         return CommandResult.success();
     }
