@@ -493,8 +493,8 @@ public class MPTown implements Town {
                 .set(DataQuery.of("pvp"), this.pvp)
                 .set(DataQuery.of("spawn"), Hacks.toContainer(this.spawn))
                 .set(DataQuery.of("visibility"), this.visibility)
-                .set(DataQuery.of("plots"), this.citizens)
-                .set(DataQuery.of("citizens"), this.plots);
+                .set(DataQuery.of("citizens"), this.citizens)
+                .set(DataQuery.of("plots"), this.plots);
 
         final Collection<DataManipulator> manipulators = this.manipulators.values();
         if (!manipulators.isEmpty()) {
