@@ -192,7 +192,7 @@ public class MPTown implements Town {
     private void checkGracePeriod() {
         final Duration grace = Sponge.getServiceManager().provideUnchecked(ConfigService.class).getGlobal().getTownCategory().getFoundationGracePeriod();
         if (Instant.now().isAfter(this.founded.plus(grace))) {
-            this.pvp = PvPOptions.ON;
+            setPvP(PvPOptions.ON);
             Sponge.getServer().getBroadcastChannel().send(TextUtil.watermark(this.name, " grace period just ended"));
         }
     }
