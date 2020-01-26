@@ -22,16 +22,16 @@ public final class PlotTypeRegistryModule implements AdditionalCatalogRegistryMo
     public void registerDefaults() {
         register(new MPPlotType(
                 "plot",
-                "plot",
+                "Plot",
                 (t, loc) -> Sponge.getServiceManager().provideUnchecked(PlotService.class)
                         .testNear(loc, plot -> plot != null && plot.town().get().intValue() == t.getId(), false)));
         register(new MPPlotType(
                 "homeblock",
-                "homeblock",
+                "Homeblock",
                 (t, loc) -> false));
         register(new MPPlotType(
                 "outpost",
-                "outpost",
+                "Outpost",
                 (t, loc) -> !Sponge.getServiceManager().provideUnchecked(PlotService.class)
                         .testNear(loc, plot -> plot != null && plot.town().get().intValue() == t.getId(), false)));
     }
