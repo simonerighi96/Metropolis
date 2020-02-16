@@ -1,6 +1,8 @@
 package me.morpheus.metropolis.commands.town;
 
+import me.morpheus.metropolis.Metropolis;
 import me.morpheus.metropolis.api.command.args.MPGenericArguments;
+import me.morpheus.metropolis.api.command.args.parsing.MinimalInputTokenizer;
 import me.morpheus.metropolis.api.config.ConfigService;
 import me.morpheus.metropolis.api.config.GlobalConfig;
 import me.morpheus.metropolis.api.data.citizen.CitizenData;
@@ -29,12 +31,17 @@ import java.util.Optional;
 class SpawnCommand extends AbstractPlayerCommand {
 
     SpawnCommand() {
-        super(MPGenericArguments.townOrHomeTown(Text.of("town")), InputTokenizer.rawInput());
+        super(
+                MPGenericArguments.townOrHomeTown(Text.of("townOrHomeTown")),
+                MinimalInputTokenizer.INSTANCE,
+                Metropolis.ID + ".commands.town.spawn",
+                Text.of()
+        );
     }
 
     @Override
     public CommandResult process(Player source, CommandContext context) throws CommandException {
-        final Optional<Town> townOpt = context.getOne("town");
+        final Optional<Town> townOpt = context.getOne("townOrHomeTown");
 
         if (!townOpt.isPresent()) {
             source.sendMessage(TextUtil.watermark(TextColors.RED, "You don't have a town"));
@@ -68,15 +75,5 @@ class SpawnCommand extends AbstractPlayerCommand {
         }
         source.transferToWorld(townOpt.get().getSpawn().getExtent(), townOpt.get().getSpawn().getPosition());
         return CommandResult.success();
-    }
-
-    @Override
-    public boolean testPermission(Player player) {
-        return true;
-    }
-
-    @Override
-    public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.of(Text.of("t spawn."));
     }
 }

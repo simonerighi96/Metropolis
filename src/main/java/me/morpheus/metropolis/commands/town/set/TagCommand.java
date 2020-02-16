@@ -1,5 +1,7 @@
 package me.morpheus.metropolis.commands.town.set;
 
+import me.morpheus.metropolis.Metropolis;
+import me.morpheus.metropolis.api.command.args.parsing.MinimalInputTokenizer;
 import me.morpheus.metropolis.api.config.ConfigService;
 import me.morpheus.metropolis.api.config.TownCategory;
 import me.morpheus.metropolis.api.data.citizen.CitizenData;
@@ -22,7 +24,12 @@ import java.util.Optional;
 class TagCommand extends AbstractCitizenCommand {
 
     TagCommand() {
-        super(GenericArguments.onlyOne(GenericArguments.string(Text.of("tag"))), InputTokenizer.rawInput());
+        super(
+                GenericArguments.onlyOne(GenericArguments.string(Text.of("tag"))),
+                MinimalInputTokenizer.INSTANCE,
+                Metropolis.ID + ".commands.town.set.tag",
+                Text.of()
+        );
     }
 
     @Override
@@ -47,15 +54,5 @@ class TagCommand extends AbstractCitizenCommand {
         t.sendMessage(TextUtil.watermark(TextColors.AQUA, "Town tag set to ", tag));
 
         return CommandResult.success();
-    }
-
-    @Override
-    public boolean testPermission(Player source, CitizenData cd) {
-        return true;
-    }
-
-    @Override
-    public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.of(Text.of("Sets the town’s tag"));
     }
 }

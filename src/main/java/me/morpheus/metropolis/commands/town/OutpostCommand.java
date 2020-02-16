@@ -1,6 +1,8 @@
 package me.morpheus.metropolis.commands.town;
 
+import me.morpheus.metropolis.Metropolis;
 import me.morpheus.metropolis.api.command.AbstractCitizenCommand;
+import me.morpheus.metropolis.api.command.args.parsing.MinimalInputTokenizer;
 import me.morpheus.metropolis.api.data.citizen.CitizenData;
 import me.morpheus.metropolis.api.data.town.outpost.OutpostData;
 import me.morpheus.metropolis.api.town.Town;
@@ -23,7 +25,12 @@ import java.util.Optional;
 class OutpostCommand extends AbstractCitizenCommand {
 
     OutpostCommand() {
-        super(GenericArguments.onlyOne(GenericArguments.text(Text.of("name"), TextSerializers.FORMATTING_CODE, false)), InputTokenizer.rawInput());
+        super(
+                GenericArguments.onlyOne(GenericArguments.text(Text.of("name"), TextSerializers.FORMATTING_CODE, false)),
+                MinimalInputTokenizer.INSTANCE,
+                Metropolis.ID + ".commands.town.outpost",
+                Text.of()
+        );
     }
 
     @Override
@@ -33,7 +40,7 @@ class OutpostCommand extends AbstractCitizenCommand {
         final Optional<OutpostData> odOpt = t.get(OutpostData.class);
 
         if (!odOpt.isPresent()) {
-            source.sendMessage(TextUtil.watermark(TextColors.RED, "Your town has not outpost"));
+            source.sendMessage(TextUtil.watermark(TextColors.RED, "Your town has no outpost"));
             return CommandResult.empty();
         }
 
@@ -46,15 +53,5 @@ class OutpostCommand extends AbstractCitizenCommand {
 
         source.transferToWorld(out.getExtent(), out.getPosition());
         return CommandResult.success();
-    }
-
-    @Override
-    public boolean testPermission(Player source, CitizenData cd) {
-        return true;
-    }
-
-    @Override
-    public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.of(Text.of());
     }
 }

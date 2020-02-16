@@ -33,17 +33,12 @@ public class CitizenCommandElement extends CommandElement {
             return null;
         }
 
-        if (args.peek().isEmpty()) {
-            return null;
-        }
-
         final List<User> users = new ArrayList<>(args.size());
 
         while (args.hasNext()) {
             final String next = args.next();
 
             final User u = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(next)
-                    .filter(p -> !p.get(InvisibilityData.class).filter(id -> id.vanish().get().booleanValue()).isPresent())
                     .filter(p -> p.get(CitizenData.class).filter(cd -> Sponge.getServiceManager().provideUnchecked(TownService.class).exist(cd.town().get().intValue())).isPresent())
                     .orElseThrow(() -> args.createError(Text.of("Invalid citizen!")));
 

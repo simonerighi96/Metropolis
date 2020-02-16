@@ -1,7 +1,9 @@
 package me.morpheus.metropolis.commands.town;
 
+import me.morpheus.metropolis.Metropolis;
 import me.morpheus.metropolis.api.command.AbstractMPCommand;
 import me.morpheus.metropolis.api.command.args.MPGenericArguments;
+import me.morpheus.metropolis.api.command.args.parsing.MinimalInputTokenizer;
 import me.morpheus.metropolis.api.config.ConfigService;
 import me.morpheus.metropolis.api.config.EconomyCategory;
 import me.morpheus.metropolis.api.plot.PlotType;
@@ -27,10 +29,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-class PriceCommand extends AbstractMPCommand {
+class PricesCommand extends AbstractMPCommand {
 
-    PriceCommand() {
-        super(MPGenericArguments.townOrHomeTown(Text.of("town")), InputTokenizer.rawInput());
+    PricesCommand() {
+        super(
+                MPGenericArguments.townOrHomeTown(Text.of("townOrHomeTown")),
+                MinimalInputTokenizer.INSTANCE,
+                Metropolis.ID + ".commands.town.prices",
+                Text.of()
+        );
     }
 
     @Override
@@ -43,7 +50,7 @@ class PriceCommand extends AbstractMPCommand {
         }
 
         final EconomyCategory economy = cs.getGlobal().getEconomyCategory();
-        final TownType type = context.<Town>getOne("town")
+        final TownType type = context.<Town>getOne("townOrHomeTown")
                 .map(Town::getType)
                 .orElse(TownTypes.SETTLEMENT);
 
@@ -63,15 +70,5 @@ class PriceCommand extends AbstractMPCommand {
                 .sendTo(source);
 
         return CommandResult.success();
-    }
-
-    @Override
-    public boolean testPermission(CommandSource source) {
-        return true;
-    }
-
-    @Override
-    public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.empty();
     }
 }
