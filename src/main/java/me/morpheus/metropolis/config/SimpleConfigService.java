@@ -17,6 +17,7 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollectio
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
@@ -51,6 +52,10 @@ public final class SimpleConfigService implements ConfigService {
 
     @Override
     public CompletableFuture<Void> reload() {
+        if (Files.notExists(ConfigUtil.CONF)) {
+            save();
+            return CompletableFuture.allOf();
+        }
         return CompletableFuture.runAsync(() -> {
             try {
                 CommentedConfigurationNode node = this.loader.load();
@@ -66,6 +71,9 @@ public final class SimpleConfigService implements ConfigService {
         return CompletableFuture.runAsync(() -> {
             SimpleCommentedConfigurationNode n = SimpleCommentedConfigurationNode.root();
             try {
+                if (Files.notExists(ConfigUtil.CONF)) {
+                    Files.createFile(ConfigUtil.CONF);
+                }
                 this.mapper.serialize(n);
                 this.loader.save(n);
             } catch (Exception e) {
