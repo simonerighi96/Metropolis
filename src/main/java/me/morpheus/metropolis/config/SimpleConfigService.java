@@ -66,6 +66,14 @@ public final class SimpleConfigService implements ConfigService {
         });
     }
 
+    public void populate() throws ObjectMappingException, IOException {
+        if (Files.notExists(ConfigUtil.CONF)) {
+            return;
+        }
+        CommentedConfigurationNode node = this.loader.load();
+        this.mapper.populate(node);
+    }
+
     @Override
     public CompletableFuture<Void> save() {
         return CompletableFuture.runAsync(() -> {

@@ -78,6 +78,7 @@ import me.morpheus.metropolis.town.invitation.SimpleInvitationService;
 import me.morpheus.metropolis.town.pvp.PvPOptionRegistryModule;
 import me.morpheus.metropolis.town.type.TownTypeRegistryModule;
 import me.morpheus.metropolis.town.visibility.VisibilityRegistryModule;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataRegistration;
@@ -134,6 +135,10 @@ public class Metropolis {
     public void onInit(GameInitializationEvent event) {
         try {
             registerConfigService();
+
+            Sponge.getServiceManager().provideUnchecked(ConfigService.class)
+                    .reload()
+                    .get();
         } catch (Exception e) {
             Sponge.getServiceManager().provideUnchecked(IncidentService.class)
                     .create(new MPIncident(MPGenericErrors.config(), e));
@@ -320,22 +325,9 @@ public class Metropolis {
         Sponge.getCommandManager().register(this.container, mpadmin, "mpadmin");
     }
 
-    private void registerConfigService() throws IOException, ExecutionException, InterruptedException {
-        final ConfigService cs = new SimpleConfigService();
-        if (Files.notExists(ConfigUtil.CONF)) {
-            Files.createFile(ConfigUtil.CONF);
-            Sponge.getServiceManager().setProvider(this.container, ConfigService.class, cs);
-            cs.save()
-                    .thenRun(() -> MPLog.getLogger().info("Config saved"))
-                    .exceptionally(throwable -> {
-                        Sponge.getServiceManager().provideUnchecked(IncidentService.class)
-                                .create(new MPIncident(MPGenericErrors.config(), throwable));
-                        return null;
-                    });
-        } else {
-            cs.reload().get();
-            MPLog.getLogger().info("Config loaded");
-            Sponge.getServiceManager().setProvider(this.container, ConfigService.class, cs);
-        }
+    private void registerConfigService() throws IOException, ObjectMappingException {
+        final SimpleConfigService cs = new SimpleConfigService();
+        cs.populate();
+        Sponge.getServiceManager().setProvider(this.container, ConfigService.class, cs);
     }
 }
