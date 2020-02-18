@@ -75,6 +75,14 @@ public final class Hacks {
                 .set(Queries.POSITION_Z, location.getZ());
     }
 
+    public static DataContainer toContainer(Map<String, Location<World>> outposts) {
+        final DataContainer view = DataContainer.createNew();
+        for (Map.Entry<String, Location<World>> e : outposts.entrySet()) {
+            view.set(DataQuery.of(e.getKey()), Hacks.toContainer(e.getValue()));
+        }
+        return view;
+    }
+
     public static Map<String, Location<World>> outpostFrom(DataContainer container) {
         Optional<? extends Map<?, ?>> oupostsOpt = container.getMap(TownKeys.OUTPOSTS.getQuery());
         if (!oupostsOpt.isPresent()) {

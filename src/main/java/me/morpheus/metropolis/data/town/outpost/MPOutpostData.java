@@ -80,7 +80,7 @@ public class MPOutpostData extends AbstractData<OutpostData, ImmutableOutpostDat
     public DataContainer toContainer() {
         DataContainer container = super.toContainer();
         if (this.outposts != null && !this.outposts.isEmpty()) {
-            container.set(TownKeys.OUTPOSTS.getQuery(), this.outposts);
+            container.set(TownKeys.OUTPOSTS.getQuery(), Hacks.toContainer(this.outposts));
         }
 
         return container;
