@@ -62,6 +62,6 @@ public interface Town extends DataHolder, MessageReceiver {
 
     boolean unclaim(Location<World> location);
 
-    void disband();
+    boolean disband();
 
 }

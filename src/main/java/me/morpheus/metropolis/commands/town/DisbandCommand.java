@@ -29,7 +29,11 @@ class DisbandCommand extends AbstractCitizenCommand {
 
     @Override
     public CommandResult process(Player source, CommandContext context, CitizenData cd, Town t) throws CommandException {
-        t.disband();
+        final boolean success = t.disband();
+        if (!success) {
+            source.sendMessage(TextUtil.watermark(TextColors.RED, "Error while disbanding"));
+            return CommandResult.empty();
+        }
 
         final Text broadcast = TextUtil.watermark(TextColors.AQUA, t.getName(), " fell into ruin ");
         Sponge.getServer().getBroadcastChannel().send(broadcast);

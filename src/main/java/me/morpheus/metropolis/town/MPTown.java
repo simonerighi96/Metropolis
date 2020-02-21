@@ -457,11 +457,11 @@ public class MPTown implements Town {
     }
 
     @Override
-    public void disband() {
+    public boolean disband() {
         try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             DeleteTownEvent.Pre event = new MPDeleteTownEventPre(frame.getCurrentCause(), this);
             if (Sponge.getEventManager().post(event)) {
-                return;
+                return false;
             }
         }
         final TownService ts = Sponge.getServiceManager().provideUnchecked(TownService.class);
@@ -482,6 +482,7 @@ public class MPTown implements Town {
             DeleteTownEvent.Post event = new MPDeleteTownEventPost(frame.getCurrentCause(), this);
             Sponge.getEventManager().post(event);
         }
+        return true;
     }
 
     @Override
