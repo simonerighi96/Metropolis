@@ -33,6 +33,7 @@ import org.spongepowered.api.world.World;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
 
 public class SimpleTownService implements TownService {
@@ -113,12 +115,15 @@ public class SimpleTownService implements TownService {
 
     @Override
     public CompletableFuture<Void> saveAll() {
+        if (this.towns.isEmpty() && this.deleted.isEmpty()) {
+            return CompletableFuture.completedFuture(null);
+        }
         return CompletableFuture.runAsync(() -> {
             if (Files.notExists(SimpleTownService.TOWN_DATA)) {
                 try {
                     Files.createDirectories(SimpleTownService.TOWN_DATA);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new CompletionException(e);
                 }
             }
             for (Town town : this.towns.values()) {
@@ -160,22 +165,20 @@ public class SimpleTownService implements TownService {
 
     @Override
     public CompletableFuture<Void> loadAll() {
+        if (Files.notExists(SimpleTownService.TOWN_DATA)) {
+            return CompletableFuture.completedFuture(null);
+        }
         return CompletableFuture.runAsync(() -> {
-            if (Files.exists(SimpleTownService.TOWN_DATA)) {
-                try (Stream<Path> towns = Files.list(SimpleTownService.TOWN_DATA)) {
-                    towns.forEach(town -> {
-                        try (InputStream in = Files.newInputStream(town)) {
-                            final DataContainer container = DataFormats.JSON.readFrom(in);
-                            final Town t = from(container);
-                            register(t);
-                        } catch (Exception e) {
-                            MPLog.getLogger().error("Unable to load Town ({})", town);
-                            MPLog.getLogger().error("Error: ", e);
-                        }
-                    });
-                } catch (IOException e) {
-                    MPLog.getLogger().error("Unable to load Towns ", e);
+            try (DirectoryStream<Path> towns = Files.newDirectoryStream(SimpleTownService.TOWN_DATA)) {
+                for (Path town : towns) {
+                    try (InputStream in = Files.newInputStream(town)) {
+                        final DataContainer container = DataFormats.JSON.readFrom(in);
+                        final Town t = from(container);
+                        register(t);
+                    }
                 }
+            } catch (IOException e) {
+                throw new CompletionException(e);
             }
         });
     }
