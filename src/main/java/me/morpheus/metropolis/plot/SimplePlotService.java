@@ -3,15 +3,25 @@ package me.morpheus.metropolis.plot;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import me.morpheus.metropolis.MPLog;
+import me.morpheus.metropolis.Metropolis;
 import me.morpheus.metropolis.api.data.plot.ImmutablePlotData;
 import me.morpheus.metropolis.api.data.plot.PlotData;
 import me.morpheus.metropolis.api.plot.PlotService;
 import me.morpheus.metropolis.config.ConfigUtil;
+import me.morpheus.metropolis.plot.listeners.InternalChangeBlockHandler;
+import me.morpheus.metropolis.plot.listeners.InternalClaimHandler;
+import me.morpheus.metropolis.plot.listeners.InternalDamageEntityHandler;
+import me.morpheus.metropolis.plot.listeners.InternalExplosionTownHandler;
+import me.morpheus.metropolis.plot.listeners.InternalInteractHandler;
+import me.morpheus.metropolis.plot.listeners.InternalMoveEntityHandler;
+import me.morpheus.metropolis.plot.listeners.InternalNotifyHandler;
+import me.morpheus.metropolis.util.VectorUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.explosion.Explosion;
@@ -62,51 +72,24 @@ public class SimplePlotService implements PlotService {
 
     @Override
     public Optional<PlotData> get(Location<World> loc) {
-        final Vector2i cp = to2i(loc);
+        final Vector2i cp = VectorUtil.toChunk2i(loc);
         final UUID world = loc.getExtent().getUniqueId();
 
-        final Map<Vector2i, PlotData> plots = this.map.get(world);
-        if (plots == null) {
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable(plots.get(cp));
+        return Optional.ofNullable(get(world, cp));
     }
 
-    @Override
-    public Stream<PlotData> get(Explosion explosion) {
-        final Location<World> loc = explosion.getLocation();
-        final Map<Vector2i, PlotData> plots = this.map.get(loc.getExtent().getUniqueId());
+    @Nullable
+    public PlotData get(UUID world, Vector2i cp) {
+        final Map<Vector2i, PlotData> plots = this.map.get(world);
         if (plots == null) {
-            return Stream.empty();
+            return null;
         }
-
-        final float radius = explosion.getRadius();
-        final Vector2i nw = to2i(loc.sub(radius, 0, radius));
-        final Vector2i se = to2i(loc.add(radius, 0, radius));
-
-        if (nw.equals(se)) {
-            final Vector2i center = to2i(loc);
-            return Stream.of(plots.get(center));
-        }
-
-        final List<PlotData> pds = new ArrayList<>();
-
-        for (; nw.getY() < se.getY(); nw.add(Vector2i.UNIT_Y)) {
-            for (; nw.getX() < se.getX(); nw.add(Vector2i.UNIT_X)) {
-                final PlotData pd = plots.get(nw);
-                if (pd != null) {
-                    pds.add(pd);
-                }
-            }
-        }
-
-        return pds.stream();
+        return plots.get(cp);
     }
 
     @Override
     public Optional<PlotData> claim(Location<World> loc, PlotData pd) {
-        final Vector2i cp = to2i(loc);
+        final Vector2i cp = VectorUtil.toChunk2i(loc);
         final UUID world = loc.getExtent().getUniqueId();
 
         return Optional.ofNullable(claim(world, cp, pd));
@@ -114,7 +97,7 @@ public class SimplePlotService implements PlotService {
 
     @Override
     public Optional<PlotData> unclaim(Location<World> loc) {
-        final Vector2i cp = to2i(loc);
+        final Vector2i cp = VectorUtil.toChunk2i(loc);
         final UUID world = loc.getExtent().getUniqueId();
 
         final Map<Vector2i, PlotData> plots = this.map.get(world);
@@ -157,30 +140,6 @@ public class SimplePlotService implements PlotService {
                 }
             }
         }
-    }
-
-    @Override
-    public boolean testNear(Location<World> loc, Predicate<PlotData> predicate, boolean and) {
-        final UUID world = loc.getExtent().getUniqueId();
-        final Map<Vector2i, PlotData> plots = this.map.get(world);
-
-        if (plots == null) {
-            return predicate.test(null);
-        }
-        int x = loc.getChunkPosition().getX();
-        int z = loc.getChunkPosition().getZ();
-
-        if (and) {
-            return predicate.test(plots.get(Vector2i.from(x + 1, z)))
-                    && predicate.test(plots.get(Vector2i.from(x - 1, z)))
-                    && predicate.test(plots.get(Vector2i.from(x, z + 1)))
-                    && predicate.test(plots.get(Vector2i.from(x, z - 1)));
-        }
-
-        return predicate.test(plots.get(Vector2i.from(x + 1, z)))
-                || predicate.test(plots.get(Vector2i.from(x - 1, z)))
-                || predicate.test(plots.get(Vector2i.from(x, z + 1)))
-                || predicate.test(plots.get(Vector2i.from(x, z - 1)));
     }
 
     @Override
@@ -279,14 +238,21 @@ public class SimplePlotService implements PlotService {
         });
     }
 
+    @Override
+    public void registerListeners() {
+        final PluginContainer plugin = Sponge.getPluginManager().getPlugin(Metropolis.ID).get();
+        Sponge.getEventManager().registerListeners(plugin, new InternalChangeBlockHandler(this));
+        Sponge.getEventManager().registerListeners(plugin, new InternalClaimHandler(this));
+        Sponge.getEventManager().registerListeners(plugin, new InternalDamageEntityHandler(this));
+        Sponge.getEventManager().registerListeners(plugin, new InternalExplosionTownHandler(this));
+        Sponge.getEventManager().registerListeners(plugin, new InternalInteractHandler(this));
+        Sponge.getEventManager().registerListeners(plugin, new InternalMoveEntityHandler(this));
+        Sponge.getEventManager().registerListeners(plugin, new InternalNotifyHandler(this));
+    }
+
     @Nullable
     private PlotData claim(final UUID world, final Vector2i chunk, final PlotData pd) {
         final Map<Vector2i, PlotData> plots = this.map.computeIfAbsent(world, k -> new HashMap<>());
         return plots.putIfAbsent(chunk, pd);
-    }
-
-    private Vector2i to2i(final Location<World> loc) {
-        final Vector3i cp = loc.getChunkPosition();
-        return Vector2i.from(cp.getX(), cp.getZ());
     }
 }
