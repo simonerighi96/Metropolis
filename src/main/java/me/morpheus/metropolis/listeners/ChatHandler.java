@@ -44,7 +44,7 @@ public final class ChatHandler {
                     .apply(ImmutableMap.of("tag", tOpt.get().getTag(), "rank", cdOpt.get().rank().get().getName()))
                     .build();
 
-            event.setMessage(header, Text.of(event.getMessage()));
+            event.getFormatter().setHeader(header);
         }
 
     }
