@@ -13,6 +13,7 @@ import me.morpheus.metropolis.plot.listeners.InternalClaimHandler;
 import me.morpheus.metropolis.plot.listeners.InternalDamageEntityHandler;
 import me.morpheus.metropolis.plot.listeners.InternalExplosionTownHandler;
 import me.morpheus.metropolis.plot.listeners.InternalInteractHandler;
+import me.morpheus.metropolis.plot.listeners.InternalLoginHandler;
 import me.morpheus.metropolis.plot.listeners.InternalMoveEntityHandler;
 import me.morpheus.metropolis.plot.listeners.InternalNotifyHandler;
 import me.morpheus.metropolis.util.VectorUtil;
@@ -53,6 +54,7 @@ public class SimplePlotService implements PlotService {
 
     private final Map<UUID, Map<Vector2i, PlotData>> map = new HashMap<>();
     private final Map<UUID, Set<Vector2i>> deleted = new HashMap<>();
+    private boolean loaded = false;
 
     private static final Path PLOT_DATA = ConfigUtil.DATA.resolve("plot");
 
@@ -210,6 +212,7 @@ public class SimplePlotService implements PlotService {
     @Override
     public CompletableFuture<Void> loadAll() {
         if (Files.notExists(SimplePlotService.PLOT_DATA)) {
+            this.loaded = true;
             return CompletableFuture.completedFuture(null);
         }
         return CompletableFuture.runAsync(() -> {
@@ -232,7 +235,9 @@ public class SimplePlotService implements PlotService {
                         }
                     }
                 }
+                this.loaded = true;
             } catch (IOException e) {
+                this.loaded = true;
                 throw new CompletionException(e);
             }
         });
@@ -248,11 +253,16 @@ public class SimplePlotService implements PlotService {
         Sponge.getEventManager().registerListeners(plugin, new InternalInteractHandler(this));
         Sponge.getEventManager().registerListeners(plugin, new InternalMoveEntityHandler(this));
         Sponge.getEventManager().registerListeners(plugin, new InternalNotifyHandler(this));
+        Sponge.getEventManager().registerListeners(plugin, new InternalLoginHandler(this));
     }
 
     @Nullable
     private PlotData claim(final UUID world, final Vector2i chunk, final PlotData pd) {
         final Map<Vector2i, PlotData> plots = this.map.computeIfAbsent(world, k -> new HashMap<>());
         return plots.putIfAbsent(chunk, pd);
+    }
+
+    public boolean isLoadedCompleted() {
+        return this.loaded;
     }
 }

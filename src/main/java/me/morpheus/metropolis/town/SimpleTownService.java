@@ -52,6 +52,7 @@ public class SimpleTownService implements TownService {
     private int lastID = Integer.MIN_VALUE + 1;
     private final Int2ObjectMap<Town> towns = new Int2ObjectOpenHashMap<>();
     private final IntSet deleted = new IntOpenHashSet();
+    private boolean loaded = false;
 
     private static final Path TOWN_DATA = ConfigUtil.DATA.resolve("town");
 
@@ -162,6 +163,7 @@ public class SimpleTownService implements TownService {
     @Override
     public CompletableFuture<Void> loadAll() {
         if (Files.notExists(SimpleTownService.TOWN_DATA)) {
+            this.loaded = true;
             return CompletableFuture.completedFuture(null);
         }
         return CompletableFuture.runAsync(() -> {
@@ -173,7 +175,9 @@ public class SimpleTownService implements TownService {
                         register(t);
                     }
                 }
+                this.loaded = true;
             } catch (IOException e) {
+                this.loaded = true;
                 throw new CompletionException(e);
             }
         });
@@ -219,6 +223,10 @@ public class SimpleTownService implements TownService {
     public void registerListeners() {
         final PluginContainer plugin = Sponge.getPluginManager().getPlugin(Metropolis.ID).get();
         Sponge.getEventManager().registerListeners(plugin, new InternalTownTransactionHandler());
-        Sponge.getEventManager().registerListeners(plugin, new InternalLoginHandler());
+        Sponge.getEventManager().registerListeners(plugin, new InternalLoginHandler(this));
+    }
+
+    public boolean isLoadedCompleted() {
+        return this.loaded;
     }
 }
