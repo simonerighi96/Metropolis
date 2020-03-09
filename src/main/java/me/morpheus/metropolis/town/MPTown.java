@@ -512,6 +512,7 @@ public class MPTown implements Town {
         }
         final TownService ts = Sponge.getServiceManager().provideUnchecked(TownService.class);
         ts.delete(this.id);
+        getBank().ifPresent(account -> Sponge.getServiceManager().provideUnchecked(EconomyService.class).deleteAccount(account.getIdentifier()));
 
         for (Player player : Sponge.getServer().getOnlinePlayers()) {
             player.get(CitizenKeys.TOWN).ifPresent(town -> {
