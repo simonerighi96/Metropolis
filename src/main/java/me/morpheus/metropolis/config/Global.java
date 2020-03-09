@@ -35,7 +35,7 @@ public class Global implements GlobalConfig {
     private SimpleEconomyCategory economy = new SimpleEconomyCategory();
 
     @Setting(value = "enable-plot-message", comment = "show town name when entering a plot. Disable by default for performance reason")
-    private boolean plotMessage;
+    private boolean plotMessage = true;
 
     @Setting(value = "users-per-tick", comment = "show town name when entering a plot. Disable by default for performance reason")
     private int userspertick = 100;
