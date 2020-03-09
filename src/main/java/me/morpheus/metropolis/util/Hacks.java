@@ -65,20 +65,10 @@ public final class Hacks {
         }
     }
 
-    public static DataContainer toContainer(Location<World> location) {
-        return DataContainer.createNew()
-                .set(Queries.CONTENT_VERSION, 1)
-                .set(Queries.WORLD_NAME, location.getExtent().getName())
-                .set(Queries.WORLD_ID, location.getExtent().getUniqueId().toString())
-                .set(Queries.POSITION_X, location.getX())
-                .set(Queries.POSITION_Y, location.getY())
-                .set(Queries.POSITION_Z, location.getZ());
-    }
-
     public static DataContainer toContainer(Map<String, Location<World>> outposts) {
         final DataContainer view = DataContainer.createNew();
         for (Map.Entry<String, Location<World>> e : outposts.entrySet()) {
-            view.set(DataQuery.of(e.getKey()), Hacks.toContainer(e.getValue()));
+            view.set(DataQuery.of(e.getKey()), e.getValue());
         }
         return view;
     }
