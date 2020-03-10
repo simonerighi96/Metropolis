@@ -14,20 +14,18 @@ class MPRank implements Rank {
     @Setting private String id;
     @Setting private String name;
     @Setting(value = "tax-exempt") private boolean isTaxExempt;
-    @Setting private boolean canBeKickedForInactivity;
-    @Setting private boolean canLeave;
-    @Setting(value = "default-perm") private int defPerm;
+    @Setting(value = "can-be-kicked-for-inactivity") private boolean canBeKickedForInactivity;
+    @Setting(value = "can-leave") private boolean canLeave;
     @Setting private Object2IntMap<Flag> permissions = new Object2IntOpenHashMap<>();
 
-    MPRank(String id, String name, boolean isTaxExempt, boolean canBeKickedForInactivity, boolean canLeave, int defPerm, Object2IntMap<Flag> permissions) {
+    MPRank(String id, String name, boolean isTaxExempt, boolean canBeKickedForInactivity, boolean canLeave, Object2IntMap<Flag> permissions) {
         this.id = id;
         this.name = name;
         this.isTaxExempt = isTaxExempt;
         this.canBeKickedForInactivity = canBeKickedForInactivity;
         this.canLeave = canLeave;
-        this.defPerm = defPerm;
         this.permissions.putAll(permissions);
-        this.permissions.defaultReturnValue(defPerm);
+        this.permissions.defaultReturnValue(Integer.MIN_VALUE);
     }
 
     private MPRank() {
@@ -65,11 +63,11 @@ class MPRank implements Rank {
 
     @Override
     public int getPermission(Flag flag) {
-        if (this.permissions.defaultReturnValue() == 0) { //TODO
-            this.permissions.defaultReturnValue(this.defPerm);
-        }
-        int perm = this.permissions.getInt(flag);
-        return perm;
+        return this.permissions.getInt(flag);
+    }
+
+    public Object2IntMap<Flag> getPermissions() {
+        return this.permissions;
     }
 
     @Override
