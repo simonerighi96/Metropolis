@@ -36,9 +36,6 @@ public final class ChangeBlockTownHandler {
         );
         if (notAllowed) {
             event.setCancelled(true);
-            if (source != null) {
-                source.getPlayer().ifPresent(EventUtil::sendNoPermissionMessage);
-            }
         }
     }
 
