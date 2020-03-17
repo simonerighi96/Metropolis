@@ -30,6 +30,10 @@ public final class MoveEntityTownHandler {
             return;
         }
 
+        if (toOpt.equals(event.getFromPlot())) {
+            return;
+        }
+
         final TownService ts = Sponge.getServiceManager().provideUnchecked(TownService.class);
         final Town t = ts.get(toOpt.get().town().get().intValue()).get();
 
