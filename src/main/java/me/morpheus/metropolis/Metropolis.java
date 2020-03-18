@@ -167,8 +167,12 @@ public class Metropolis {
             Sponge.getEventManager().registerListeners(this.container, new MoveEntityTownHandler());
         }
 
-        Sponge.getEventManager().registerListeners(this.container, new ChangeBlockDebugHandler()); //TODO
-        Sponge.getEventManager().registerListeners(this.container, new DamageEntityDebugHandler()); //TODO
+        if (g.getDebugCategory().isEnabled()) {
+            registerDebugCommands();
+
+            Sponge.getEventManager().registerListeners(this.container, new ChangeBlockDebugHandler());
+            Sponge.getEventManager().registerListeners(this.container, new DamageEntityDebugHandler());
+        }
     }
 
     @Listener
@@ -339,7 +343,9 @@ public class Metropolis {
         final CommandDispatcher mpadmin = new AdminDispatcher();
         mpadmin.registerDefaults();
         Sponge.getCommandManager().register(this.container, mpadmin, "mpadmin");
+    }
 
+    private void registerDebugCommands() {
         final CommandSpec changeblock = CommandSpec.builder()
                 .arguments(GenericArguments.optional(GenericArguments.bool(Text.of("toggle"))))
                 .executor((src, args) -> {
@@ -365,7 +371,7 @@ public class Metropolis {
                 .child(damage, "damage")
                 .permission(Metropolis.ID + ".commands.debug")
                 .build();
-        Sponge.getCommandManager().register(this.container, debug, "mpdebug"); //TODO pls no
+        Sponge.getCommandManager().register(this.container, debug, "mpdebug");
     }
 
     private void registerConfigService() throws IOException, ObjectMappingException {

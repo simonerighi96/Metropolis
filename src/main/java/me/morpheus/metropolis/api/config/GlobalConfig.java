@@ -10,6 +10,8 @@ public interface GlobalConfig {
 
     EconomyCategory getEconomyCategory();
 
+    DebugCategory getDebugCategory();
+
     boolean isPlotMessageEnabled();
 
 }
