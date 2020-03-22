@@ -36,7 +36,7 @@ class PvPCommand extends AbstractCitizenCommand {
         final PvPOption option = context.requireOne("option");
 
         t.setPvP(option);
-        t.sendMessage(TextUtil.watermark(TextColors.AQUA, "Town PvP set to ", option.getName()));
+        t.sendMessage(Text.of("Town PvP set to ", option.getName()));
 
         return CommandResult.success();
     }

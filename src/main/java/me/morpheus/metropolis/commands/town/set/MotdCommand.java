@@ -46,7 +46,7 @@ class MotdCommand extends AbstractCitizenCommand {
         } else {
             tdOpt.get().set(TownKeys.MOTD, Optional.of(motd));
         }
-        t.sendMessage(TextUtil.watermark(TextColors.AQUA, "Town motd set to ", motd));
+        t.sendMessage(Text.of("Town motd set to ", motd));
 
         return CommandResult.success();
     }

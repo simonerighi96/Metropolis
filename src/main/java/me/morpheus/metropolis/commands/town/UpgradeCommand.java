@@ -35,7 +35,7 @@ class UpgradeCommand extends AbstractCitizenCommand {
             source.sendMessage(TextUtil.watermark(TextColors.RED, "Upgrade failed"));
             return CommandResult.empty();
         }
-        t.sendMessage(TextUtil.watermark(TextColors.AQUA, upgrade.getName(), " upgrade completed"));
+        t.sendMessage(Text.of(upgrade.getName(), " upgrade completed"));
         return CommandResult.success();
     }
 }

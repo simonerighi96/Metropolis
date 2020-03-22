@@ -52,7 +52,7 @@ class NameCommand extends AbstractCitizenCommand {
         }
 
         t.setName(name);
-        t.sendMessage(TextUtil.watermark(TextColors.AQUA, "your town was renamed to ", name));
+        t.sendMessage(Text.of("your town was renamed to ", name));
 
         return CommandResult.success();
     }

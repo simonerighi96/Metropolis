@@ -36,7 +36,7 @@ class VisibilityCommand extends AbstractCitizenCommand {
         final Visibility visibility = context.requireOne("visibility");
 
         t.setVisibility(visibility);
-        t.sendMessage(TextUtil.watermark(TextColors.AQUA, "Town visibility status set to ", visibility.getName()));
+        t.sendMessage(Text.of("Town visibility set to ", visibility.getName()));
 
         return CommandResult.success();
     }

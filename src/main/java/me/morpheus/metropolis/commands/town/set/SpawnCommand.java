@@ -27,7 +27,7 @@ class SpawnCommand extends AbstractHomeTownCommand {
     @Override
     public CommandResult process(Player source, CommandContext context, CitizenData cd, Town t, PlotData pd) throws CommandException {
         t.setSpawn(source.getLocation());
-        t.sendMessage(TextUtil.watermark("Town spawn set to ", t.getSpawn().getBlockPosition(), " in ", t.getSpawn().getExtent().getName()));
+        t.sendMessage(Text.of("Town spawn set to ", t.getSpawn().getBlockPosition(), " in ", t.getSpawn().getExtent().getName()));
 
         return CommandResult.success();
     }

@@ -46,7 +46,7 @@ class DescriptionCommand extends AbstractCitizenCommand {
         } else {
             tdOpt.get().set(TownKeys.DESCRIPTION, Optional.of(description));
         }
-        t.sendMessage(TextUtil.watermark(TextColors.AQUA, "Town description set to ", description));
+        t.sendMessage(Text.of("Town description set to ", description));
 
         return CommandResult.success();
     }

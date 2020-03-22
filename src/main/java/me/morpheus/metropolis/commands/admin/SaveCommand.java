@@ -32,11 +32,11 @@ class SaveCommand extends AbstractMPCommand {
     public CommandResult process(CommandSource source, CommandContext context) throws CommandException {
         Sponge.getServiceManager().provideUnchecked(TownService.class)
                 .saveAll()
-                .thenRun(() -> source.sendMessage(TextUtil.watermark("Towns saved")));
+                .thenRun(() -> source.sendMessage(TextUtil.watermark(TextColors.AQUA, "Towns saved")));
 
         Sponge.getServiceManager().provideUnchecked(PlotService.class)
                 .saveAll()
-                .thenRun(() -> source.sendMessage(TextUtil.watermark("Plots saved")));
+                .thenRun(() -> source.sendMessage(TextUtil.watermark(TextColors.AQUA, "Plots saved")));
 
         return CommandResult.success();
     }

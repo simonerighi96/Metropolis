@@ -42,6 +42,7 @@ class SetCommand extends AbstractCitizenCommand {
         final Collection<User> citizens = context.getAll("citizens");
         final Rank rank = context.requireOne("rank");
 
+        final Text sourceName = NameUtil.getDisplayName(source);
         for (User user : citizens) {
             final Optional<CitizenData> cdOpt = user.get(CitizenData.class);
             if (!cdOpt.isPresent()) {
@@ -49,8 +50,10 @@ class SetCommand extends AbstractCitizenCommand {
             } else if (cdOpt.get().town().get().intValue() != cd.town().get().intValue()) {
                 source.sendMessage(TextUtil.watermark(TextColors.RED, NameUtil.getDisplayName(user), " is not part of your town"));
             } else {
+                final Text citizenName = NameUtil.getDisplayName(user);
                 cdOpt.get().set(CitizenKeys.RANK, rank);
                 user.offer(cdOpt.get());
+                t.sendMessage(Text.of(citizenName, " has been granted the rank of ", rank.getName(), " by ", sourceName));
             }
         }
 

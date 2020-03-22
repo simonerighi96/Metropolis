@@ -15,6 +15,7 @@ import org.spongepowered.api.command.args.parsing.InputTokenizer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -34,13 +35,20 @@ class KickCommand extends AbstractCitizenCommand {
     public CommandResult process(Player source, CommandContext context, CitizenData cd, Town t) throws CommandException {
         final Collection<User> citizens = context.getAll("citizens");
 
+        final Text sourceName = NameUtil.getDisplayName(source);
         for (User citizen : citizens) {
             final CitizenData targetCd = citizen.get(CitizenData.class).get();
 
             boolean success = targetCd.rank().get().canLeave() && t.kick(citizen.getUniqueId());
 
+            final Text citizenName = NameUtil.getDisplayName(citizen);
             if (!success) {
-                source.sendMessage(TextUtil.watermark("Unable to kick ", NameUtil.getDisplayName(citizen)));
+                source.sendMessage(TextUtil.watermark(TextColors.RED, "Unable to kick ", citizenName));
+            } else {
+                t.sendMessage(Text.of(citizenName, " was kicked from the town by ", sourceName));
+                if (citizen.isOnline()) {
+                    citizen.getPlayer().get().sendMessage(TextUtil.watermark(TextColors.AQUA, "You were kicked from the town by ", sourceName));
+                }
             }
         }
 

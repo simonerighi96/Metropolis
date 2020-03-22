@@ -42,7 +42,8 @@ class LeaveCommand extends AbstractCitizenCommand {
             return CommandResult.empty();
         }
 
-        t.sendMessage(TextUtil.watermark(TextColors.AQUA, NameUtil.getDisplayName(source), " left the town"));
+        final Text sourceName = NameUtil.getDisplayName(source);
+        t.sendMessage(Text.of(sourceName, " left the town"));
         source.sendMessage(TextUtil.watermark(TextColors.AQUA, "You left the town"));
         return CommandResult.success();
     }

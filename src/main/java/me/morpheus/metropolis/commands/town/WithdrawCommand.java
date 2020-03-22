@@ -8,6 +8,7 @@ import me.morpheus.metropolis.api.config.GlobalConfig;
 import me.morpheus.metropolis.api.data.citizen.CitizenData;
 import me.morpheus.metropolis.api.town.Town;
 import me.morpheus.metropolis.util.EconomyUtil;
+import me.morpheus.metropolis.util.NameUtil;
 import me.morpheus.metropolis.util.TextUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -63,6 +64,8 @@ public class WithdrawCommand extends AbstractCitizenCommand {
             return CommandResult.empty();
         }
 
+        final Text sourceName = NameUtil.getDisplayName(source);
+        t.sendMessage(Text.of(sourceName, " withdrew ", amount, " from the town bank"));
         return CommandResult.success();
     }
 }

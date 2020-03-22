@@ -51,7 +51,7 @@ class TagCommand extends AbstractCitizenCommand {
         }
 
         t.setTag(Text.of(tag));
-        t.sendMessage(TextUtil.watermark(TextColors.AQUA, "Town tag set to ", tag));
+        t.sendMessage(Text.of("Town tag set to ", tag));
 
         return CommandResult.success();
     }

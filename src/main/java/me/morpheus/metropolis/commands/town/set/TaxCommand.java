@@ -48,7 +48,7 @@ class TaxCommand extends AbstractCitizenCommand {
                 tdOpt.get().set(TownKeys.TAX, tax);
             }
         }
-        t.sendMessage(TextUtil.watermark(TextColors.AQUA, "Town tax set to ", tax));
+        t.sendMessage(Text.of("Town tax set to ", tax));
 
         return CommandResult.success();
     }
