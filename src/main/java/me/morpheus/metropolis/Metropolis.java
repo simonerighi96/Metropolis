@@ -59,6 +59,7 @@ import me.morpheus.metropolis.health.MPreconditions;
 import me.morpheus.metropolis.health.SimpleIncidentService;
 import me.morpheus.metropolis.listeners.ChangeBlockTownHandler;
 import me.morpheus.metropolis.listeners.ChatHandler;
+import me.morpheus.metropolis.listeners.TownChatHandler;
 import me.morpheus.metropolis.listeners.DamageEntityTownHandler;
 import me.morpheus.metropolis.listeners.debug.ChangeBlockDebugHandler;
 import me.morpheus.metropolis.listeners.InteractTownHandler;
@@ -158,10 +159,14 @@ public class Metropolis {
         Sponge.getEventManager().registerListeners(this.container, new InteractTownHandler());
         Sponge.getEventManager().registerListeners(this.container, new SpawnEntityTownHandler());
         Sponge.getEventManager().registerListeners(this.container, new ReloadHandler());
-        Sponge.getEventManager().registerListeners(this.container, new ChatHandler());
+        Sponge.getEventManager().registerListeners(this.container, new TownChatHandler());
         Sponge.getEventManager().registerListeners(this.container, new SaveHandler());
 
         final GlobalConfig g = Sponge.getServiceManager().provideUnchecked(ConfigService.class).getGlobal();
+
+        if (g.getChatCategory().isEnabled()) {
+            Sponge.getEventManager().registerListeners(this.container, new ChatHandler());
+        }
 
         if (g.isPlotMessageEnabled()) {
             Sponge.getEventManager().registerListeners(this.container, new MoveEntityTownHandler());
