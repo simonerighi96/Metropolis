@@ -39,7 +39,6 @@ public final class DamageEntityTownHandler {
         final Object source = EventUtil.getDamageSource(event);
 
         if (!(source instanceof Player)) {
-            event.setCancelled(true);
             return;
         }
 
@@ -77,7 +76,6 @@ public final class DamageEntityTownHandler {
         final Object source = EventUtil.getDamageSource(event);
 
         if (!(source instanceof Player)) {
-            event.setCancelled(true);
             return;
         }
 
