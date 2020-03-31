@@ -144,7 +144,7 @@ public class MPTown implements Town {
 
         this.spawn = spawn;
 
-        this.pvp = global.getTownCategory().getDefaultsCategory().pvp();
+        this.pvp = PvPOptions.GRACE_PERIOD;
         this.visibility = global.getTownCategory().getDefaultsCategory().visibility();
 
         this.dirty = true;
@@ -255,7 +255,8 @@ public class MPTown implements Town {
     private void checkGracePeriod() {
         final Duration grace = Sponge.getServiceManager().provideUnchecked(ConfigService.class).getGlobal().getTownCategory().getFoundationGracePeriod();
         if (Instant.now().isAfter(this.founded.plus(grace))) {
-            setPvP(PvPOptions.ON);
+            final GlobalConfig global = Sponge.getServiceManager().provideUnchecked(ConfigService.class).getGlobal();
+            setPvP(global.getTownCategory().getDefaultsCategory().pvp());
             Sponge.getServer().getBroadcastChannel().send(TextUtil.watermark(TextColors.AQUA, this.name, " grace period just ended"));
         }
     }
