@@ -14,6 +14,7 @@ public final class PlotDispatcher extends AbstractCommandDispatcher {
     public void registerDefaults() {
         register(new InfoCommand(), "info");
         register(new BuyCommand(), "buy");
+        register(new DisownCommand(), "disown");
         register(new SellCommand(), "sell");
         register(new NameCommand(), "name");
 
