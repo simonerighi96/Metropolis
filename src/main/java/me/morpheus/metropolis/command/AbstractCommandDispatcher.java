@@ -12,6 +12,7 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.command.CommandMessageFormatting;
 import org.spongepowered.api.command.CommandNotFoundException;
+import org.spongepowered.api.command.CommandPermissionException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.ImmutableCommandMapping;
@@ -148,8 +149,16 @@ public abstract class AbstractCommandDispatcher implements CommandDispatcher {
 
         final String root = index == -1 ? arguments : arguments.substring(0, index);
 
-        final CommandMapping mapping = get(root, source)
-                .orElseThrow(() -> new CommandNotFoundException(Text.of("Unknown command. Try /help for a list of commands"), root)); //TODO
+        final CommandMapping mapping = this.commands.get(root);
+        if (mapping == null) {
+            if (root.isEmpty()) {
+                throw new ArgumentParseException(Text.of("Not enough arguments!"), arguments, 0);
+            }
+            throw new CommandNotFoundException(root);
+        }
+        if (!mapping.getCallable().testPermission(source)) {
+            throw new CommandPermissionException();
+        }
 
         final String args = arguments.substring(root.length()).trim();
         final CommandCallable spec = mapping.getCallable();
