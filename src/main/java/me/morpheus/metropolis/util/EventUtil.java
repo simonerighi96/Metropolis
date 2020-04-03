@@ -100,7 +100,12 @@ public final class EventUtil {
             return true;
         }
 
-        final User owner = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(ownerId).get();
+        final Optional<User> ownerOpt = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(ownerId);
+        if (!ownerOpt.isPresent()) {
+            //TODO wtf
+            return false;
+        }
+        final User owner = ownerOpt.get();
 
         final Optional<CitizenData> optOwnerData = owner.get(CitizenData.class);
         if (!optOwnerData.isPresent()) {
