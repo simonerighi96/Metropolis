@@ -3,12 +3,14 @@ package me.morpheus.metropolis.listeners;
 import me.morpheus.metropolis.api.data.plot.PlotData;
 import me.morpheus.metropolis.api.event.block.InteractBlockTownEvent;
 import me.morpheus.metropolis.api.event.entity.InteractEntityTownEvent;
+import me.morpheus.metropolis.api.event.item.inventory.InteractInventoryTownEvent;
 import me.morpheus.metropolis.api.event.item.inventory.InteractItemTownEvent;
 import me.morpheus.metropolis.api.flag.Flag;
 import me.morpheus.metropolis.api.flag.Flags;
 import me.morpheus.metropolis.api.plot.PlotService;
 import me.morpheus.metropolis.util.EventUtil;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.manipulator.mutable.entity.TameableData;
 import org.spongepowered.api.data.property.item.SaturationProperty;
 import org.spongepowered.api.entity.Entity;
@@ -138,6 +140,24 @@ public final class InteractTownHandler {
             EventUtil.sendNoPermissionMessage((Player) root);
         }
 
+    }
+
+    @Listener(beforeModifications = true)
+    public void onInteractTownInventoryOpen(InteractInventoryTownEvent.Open event) {
+        final BlockSnapshot block = event.getContext().get(EventContextKeys.BLOCK_HIT).get();
+        final PlotService ps = Sponge.getServiceManager().provideUnchecked(PlotService.class);
+        final PlotData pd = ps.get(block.getLocation().get()).get();
+
+        final Object root = event.getCause().root();
+
+        if (!(root instanceof Player)) {
+            event.setCancelled(true);
+            return;
+        }
+        if (!EventUtil.hasPermission((Player) root, pd, Flags.INTERACT_INVENTORY)) {
+            event.setCancelled(true);
+            EventUtil.sendNoPermissionMessage((Player) root);
+        }
     }
 
 }

@@ -3,22 +3,29 @@ package me.morpheus.metropolis.plot.listeners;
 import me.morpheus.metropolis.api.data.plot.PlotData;
 import me.morpheus.metropolis.api.event.block.InteractBlockTownEvent;
 import me.morpheus.metropolis.api.event.entity.InteractEntityTownEvent;
+import me.morpheus.metropolis.api.event.item.inventory.InteractInventoryTownEvent;
 import me.morpheus.metropolis.api.event.item.inventory.InteractItemTownEvent;
 import me.morpheus.metropolis.api.plot.PlotService;
 import me.morpheus.metropolis.event.block.MPInteractBlockTownEventPrimary;
 import me.morpheus.metropolis.event.block.MPInteractBlockTownEventSecondary;
 import me.morpheus.metropolis.event.entity.MPInteractEntityTownEventPrimary;
 import me.morpheus.metropolis.event.entity.MPInteractEntityTownEventSecondary;
+import me.morpheus.metropolis.event.item.inventory.MPInteractInventoryTownEventOpen;
 import me.morpheus.metropolis.event.item.inventory.MPInteractItemTownEventPrimary;
 import me.morpheus.metropolis.event.item.inventory.MPInteractItemTownEventSecondary;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.world.Locatable;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
@@ -96,6 +103,30 @@ public final class InternalInteractHandler {
         } else {
             townEvent = new MPInteractEntityTownEventSecondary(event.getCause(), event.getInteractionPoint().orElse(null), entity);
         }
+        if (Sponge.getEventManager().post(townEvent)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @Listener(order = Order.FIRST, beforeModifications = true)
+    public void onInteractInventory(InteractInventoryEvent.Open event) {
+        final Optional<BlockSnapshot> hitOpt = event.getContext().get(EventContextKeys.BLOCK_HIT);
+        if (!hitOpt.isPresent()) {
+            return;
+        }
+
+        final Optional<Location<World>> locOpt = hitOpt.get().getLocation();
+        if (!locOpt.isPresent()) {
+            return;
+        }
+
+        final Optional<PlotData> pdOpt = this.ps.get(locOpt.get());
+
+        if (!pdOpt.isPresent()) {
+            return;
+        }
+
+        final InteractInventoryTownEvent.Open townEvent = new MPInteractInventoryTownEventOpen(event.getCause());
         if (Sponge.getEventManager().post(townEvent)) {
             event.setCancelled(true);
         }

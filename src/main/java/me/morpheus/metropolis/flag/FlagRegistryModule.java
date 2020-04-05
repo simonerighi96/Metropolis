@@ -27,6 +27,7 @@ public class FlagRegistryModule implements AdditionalCatalogRegistryModule<Flag>
         register(new MPFlag("damage", "Damage"));
         register(new MPFlag("interact_block", "Interact Block"));
         register(new MPFlag("interact_entity", "Interact Entity"));
+        register(new MPFlag("interact_inventory", "Interact Inventory"));
     }
 
     private void register(Flag flag) {
