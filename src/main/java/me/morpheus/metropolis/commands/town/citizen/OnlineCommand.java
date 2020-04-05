@@ -40,7 +40,7 @@ class OnlineCommand extends AbstractCitizenCommand {
 
         PaginationList.builder()
                 .title(Text.of(TextColors.GOLD, "[", TextColors.YELLOW, "Online citizens", TextColors.GOLD, "]"))
-                .contents(Text.of(TextColors.AQUA, Text.joinWith(Text.NEW_LINE, citizens)))
+                .contents(Text.of(TextColors.AQUA, Text.joinWith(Text.of(','), citizens)))
                 .padding(Text.of(TextColors.GOLD, "-"))
                 .sendTo(source);
 
