@@ -10,6 +10,7 @@ public final class PermDispatcher extends AbstractCommandDispatcher {
 
     @Override
     public void registerDefaults() {
+        register(new RemoveCommand(), "remove");
         register(new SetCommand(), "set");
         register(new ListCommand(), "list");
     }

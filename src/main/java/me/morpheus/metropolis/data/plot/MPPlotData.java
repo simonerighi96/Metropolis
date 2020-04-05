@@ -231,6 +231,14 @@ public class MPPlotData extends AbstractData<PlotData, ImmutablePlotData> implem
         this.permissions.put(flag, value);
     }
 
+    @Override
+    public void removePermission(Flag flag) {
+        if (this.permissions == null) {
+            return;
+        }
+        this.permissions.removeByte(flag);
+    }
+
     private int getTown() {
         return this.town;
     }
