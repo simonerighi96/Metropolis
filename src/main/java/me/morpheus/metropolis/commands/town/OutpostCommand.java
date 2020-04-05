@@ -7,6 +7,7 @@ import me.morpheus.metropolis.api.data.citizen.CitizenData;
 import me.morpheus.metropolis.api.data.town.outpost.OutpostData;
 import me.morpheus.metropolis.api.town.Town;
 import me.morpheus.metropolis.util.TextUtil;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -15,6 +16,10 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.args.parsing.InputTokenizer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.teleport.TeleportTypes;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -59,8 +64,12 @@ class OutpostCommand extends AbstractCitizenCommand {
                 return CommandResult.empty();
             }
         }
-
-        source.transferToWorld(out.getExtent(), out.getPosition());
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            final PluginContainer plugin = Sponge.getPluginManager().getPlugin(Metropolis.ID).get();
+            frame.addContext(EventContextKeys.TELEPORT_TYPE, TeleportTypes.COMMAND);
+            frame.addContext(EventContextKeys.PLUGIN, plugin);
+            source.transferToWorld(out.getExtent(), out.getPosition());
+        }
         return CommandResult.success();
     }
 }

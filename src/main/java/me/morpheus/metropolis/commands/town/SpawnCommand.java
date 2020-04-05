@@ -19,6 +19,10 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.parsing.InputTokenizer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.teleport.TeleportTypes;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
@@ -82,7 +86,12 @@ class SpawnCommand extends AbstractPlayerCommand {
                 return CommandResult.empty();
             }
         }
-        source.transferToWorld(townOpt.get().getSpawn().getExtent(), townOpt.get().getSpawn().getPosition());
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            final PluginContainer plugin = Sponge.getPluginManager().getPlugin(Metropolis.ID).get();
+            frame.addContext(EventContextKeys.TELEPORT_TYPE, TeleportTypes.COMMAND);
+            frame.addContext(EventContextKeys.PLUGIN, plugin);
+            source.transferToWorld(townOpt.get().getSpawn().getExtent(), townOpt.get().getSpawn().getPosition());
+        }
         return CommandResult.success();
     }
 }
