@@ -17,6 +17,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.parsing.InputTokenizer;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
@@ -70,6 +71,14 @@ class SpawnCommand extends AbstractPlayerCommand {
             }
             if (result != ResultType.SUCCESS) {
                 source.sendMessage(TextUtil.watermark(TextColors.RED, "Error while paying: ", result.name()));
+                return CommandResult.empty();
+            }
+        }
+        final Optional<Entity> vehicleOpt = source.getVehicle();
+        if (vehicleOpt.isPresent()) {
+            boolean success = source.setVehicle(null);
+            if (!success) {
+                source.sendMessage(TextUtil.watermark(TextColors.RED, "Dismount from your vehicle"));
                 return CommandResult.empty();
             }
         }

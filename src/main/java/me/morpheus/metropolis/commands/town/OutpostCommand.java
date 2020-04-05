@@ -13,6 +13,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.args.parsing.InputTokenizer;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -49,6 +50,14 @@ class OutpostCommand extends AbstractCitizenCommand {
         if (out == null) {
             source.sendMessage(TextUtil.watermark(TextColors.RED, "There is no outpost named ", name));
             return CommandResult.empty();
+        }
+        final Optional<Entity> vehicleOpt = source.getVehicle();
+        if (vehicleOpt.isPresent()) {
+            boolean success = source.setVehicle(null);
+            if (!success) {
+                source.sendMessage(TextUtil.watermark(TextColors.RED, "Dismount from your vehicle"));
+                return CommandResult.empty();
+            }
         }
 
         source.transferToWorld(out.getExtent(), out.getPosition());
