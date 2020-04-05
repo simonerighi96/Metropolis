@@ -11,6 +11,7 @@ public final class CitizenDispatcher extends AbstractCommandDispatcher {
     @Override
     public void registerDefaults() {
         register(new InfoCommand(), "info");
+        register(new ListCommand(), "list");
         register(new OnlineCommand(), "online");
     }
 

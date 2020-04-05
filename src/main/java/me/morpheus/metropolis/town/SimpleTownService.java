@@ -216,7 +216,7 @@ public class SimpleTownService implements TownService {
             plots.put(plotType, entry.getValue().shortValue());
         }
         town.setPlots(plots);
-        town.setCitizens(view.getShort(DataQuery.of("citizens")).get());
+        town.setCitizenCount(view.getShort(DataQuery.of("citizens")).get());
 
         return town;
     }

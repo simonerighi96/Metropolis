@@ -5,6 +5,8 @@ import me.morpheus.metropolis.api.rank.Rank;
 import me.morpheus.metropolis.api.town.pvp.PvPOption;
 import me.morpheus.metropolis.api.town.visibility.Visibility;
 import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageReceiver;
@@ -17,6 +19,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public interface Town extends DataHolder, MessageReceiver {
 
@@ -55,6 +58,8 @@ public interface Town extends DataHolder, MessageReceiver {
     BigDecimal getUpkeep();
 
     List<Text> getTownScreen(@Nullable MessageReceiver receiver);
+
+    Stream<GameProfile> getCitizens();
 
     boolean accept(UUID user, Rank rank);
 

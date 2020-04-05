@@ -73,6 +73,7 @@ import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.transaction.ResultType;
@@ -102,6 +103,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.DoubleSupplier;
+import java.util.stream.Stream;
 
 public class MPTown implements Town {
 
@@ -371,6 +373,20 @@ public class MPTown implements Town {
     }
 
     @Override
+    public Stream<GameProfile> getCitizens() {
+        final UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+        return uss.getAll().stream()
+                .map(uss::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(user -> {
+                    Optional<CitizenData> cdOpt = user.get(CitizenData.class);
+                    return cdOpt.isPresent() && cdOpt.get().town().get().intValue() == this.id;
+                })
+                .map(User::getProfile);
+    }
+
+    @Override
     public boolean accept(UUID user, Rank rank) {
         if (this.citizens >= this.type.getMaxCitizens()) {
             return false;
@@ -574,11 +590,11 @@ public class MPTown implements Town {
         this.dirty = dirty;
     }
 
-    public short getCitizens() {
+    public short getCitizenCount() {
         return this.citizens;
     }
 
-    public void setCitizens(short citizens) {
+    public void setCitizenCount(short citizens) {
         this.citizens = citizens;
     }
 

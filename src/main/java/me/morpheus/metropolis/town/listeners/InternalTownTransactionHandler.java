@@ -12,7 +12,7 @@ public class InternalTownTransactionHandler {
     @Listener(beforeModifications = true)
     public void onUpkeep(TownTransactionEvent.Upkeep event) {
         final MPTown t = (MPTown) event.getTargetTown();
-        event.addSupplier("citizens", t::getCitizens);
+        event.addSupplier("citizens", t::getCitizenCount);
         for (Reference2ShortMap.Entry<PlotType> entry : t.getPlots().reference2ShortEntrySet()) {
             event.addSupplier(entry.getKey().getId(), entry::getShortValue);
         }
