@@ -38,11 +38,13 @@ class KickCommand extends AbstractCitizenCommand {
         final Text sourceName = NameUtil.getDisplayName(source);
         for (User citizen : citizens) {
             final CitizenData targetCd = citizen.get(CitizenData.class).get();
-
-            boolean success = targetCd.rank().get().canLeave() && t.kick(citizen.getUniqueId());
-
             final Text citizenName = NameUtil.getDisplayName(citizen);
-            if (!success) {
+
+            if (targetCd.town().get().intValue() != t.getId()) {
+                source.sendMessage(TextUtil.watermark(TextColors.RED, citizenName, " is not part of your town"));
+            } else if (!targetCd.rank().get().canLeave()) {
+                source.sendMessage(TextUtil.watermark(TextColors.RED, citizenName, " can't leave the town"));
+            } else if (!t.kick(citizen.getUniqueId())) {
                 source.sendMessage(TextUtil.watermark(TextColors.RED, "Unable to kick ", citizenName));
             } else {
                 t.sendMessage(Text.of(citizenName, " was kicked from the town by ", sourceName));
