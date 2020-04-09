@@ -11,6 +11,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.UUID;
 
 public final class InternalClaimHandler {
@@ -30,23 +31,31 @@ public final class InternalClaimHandler {
 
         final UUID world = event.getLocation().getExtent().getUniqueId();
         final Vector2i cp = VectorUtil.toChunk2i(event.getLocation());
+        final Map<Vector2i, PlotData> wm = this.ps.get(world);
 
         if (type == PlotTypes.OUTPOST) {
-            final PlotData e = this.ps.get(world, cp.add(1, 0));
-            final PlotData w = this.ps.get(world, cp.add(-1, 0));
-            final PlotData s = this.ps.get(world, cp.add(0, 1));
-            final PlotData n = this.ps.get(world, cp.add(0, -1));
+            if (wm == null) {
+                return;
+            }
+            final PlotData e = wm.get(cp.add(1, 0));
+            final PlotData w = wm.get(cp.add(-1, 0));
+            final PlotData s = wm.get(cp.add(0, 1));
+            final PlotData n = wm.get(cp.add(0, -1));
             if (e != null || w != null || s != null || n != null) {
                 event.setCancelled(true);
             }
             return;
         }
+        if (wm == null) {
+            event.setCancelled(true);
+            return;
+        }
 
         final int town = event.getPlot().town().get();
-        final PlotData e = this.ps.get(world, cp.add(1, 0));
-        final PlotData w = this.ps.get(world, cp.add(-1, 0));
-        final PlotData s = this.ps.get(world, cp.add(0, 1));
-        final PlotData n = this.ps.get(world, cp.add(0, -1));
+        final PlotData e = wm.get(cp.add(1, 0));
+        final PlotData w = wm.get(cp.add(-1, 0));
+        final PlotData s = wm.get(cp.add(0, 1));
+        final PlotData n = wm.get(cp.add(0, -1));
         if (isNotTownPlot(town, e) && isNotTownPlot(town, w) && isNotTownPlot(town, s) && isNotTownPlot(town, n)) {
             event.setCancelled(true);
         }

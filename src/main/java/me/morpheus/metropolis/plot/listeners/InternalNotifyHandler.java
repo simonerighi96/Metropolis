@@ -1,9 +1,12 @@
 package me.morpheus.metropolis.plot.listeners;
 
+import com.flowpowered.math.vector.Vector2i;
 import me.morpheus.metropolis.api.data.plot.PlotData;
 import me.morpheus.metropolis.api.flag.Flags;
 import me.morpheus.metropolis.api.plot.PlotService;
+import me.morpheus.metropolis.plot.SimplePlotService;
 import me.morpheus.metropolis.util.EventUtil;
+import me.morpheus.metropolis.util.VectorUtil;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
@@ -14,13 +17,14 @@ import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Map;
 import java.util.Optional;
 
 public final class InternalNotifyHandler {
 
-    private final PlotService ps;
+    private final SimplePlotService ps;
 
-    public InternalNotifyHandler(PlotService ps) {
+    public InternalNotifyHandler(SimplePlotService ps) {
         this.ps = ps;
     }
 
@@ -36,6 +40,10 @@ public final class InternalNotifyHandler {
             return;
         }
 
+        final Map<Vector2i, PlotData> wm = this.ps.get(locatable.getLocation().getExtent().getUniqueId());
+        if (wm == null) {
+            return;
+        }
         event.getNeighbors().entrySet().removeIf(entry -> {
 
             if (entry.getValue().getType() == BlockTypes.AIR) {
@@ -43,9 +51,9 @@ public final class InternalNotifyHandler {
             }
 
             final Location<World> loc = locatable.getLocation().add(entry.getKey().asOffset());
-            final Optional<PlotData> pdOpt = this.ps.get(loc);
+            final PlotData pd = wm.get(VectorUtil.toChunk2i(loc));
 
-            return pdOpt.isPresent() && !EventUtil.hasPermission(source, pdOpt.get(), Flags.BLOCK_CHANGE);
+            return pd != null && !EventUtil.hasPermission(source, pd, Flags.BLOCK_CHANGE);
         });
 
     }

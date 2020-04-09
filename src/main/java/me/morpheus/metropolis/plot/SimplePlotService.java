@@ -62,7 +62,7 @@ public class SimplePlotService implements PlotService {
 
     @Override
     public Stream<PlotData> plots(UUID world) {
-        final Map<Vector2i, PlotData> plots = this.map.get(world);
+        final Map<Vector2i, PlotData> plots = get(world);
         if (plots == null) {
             return Stream.empty();
         }
@@ -75,15 +75,6 @@ public class SimplePlotService implements PlotService {
         final UUID world = loc.getExtent().getUniqueId();
 
         return Optional.ofNullable(get(world, cp));
-    }
-
-    @Nullable
-    public PlotData get(UUID world, Vector2i cp) {
-        final Map<Vector2i, PlotData> plots = this.map.get(world);
-        if (plots == null) {
-            return null;
-        }
-        return plots.get(cp);
     }
 
     @Override
@@ -99,7 +90,7 @@ public class SimplePlotService implements PlotService {
         final Vector2i cp = VectorUtil.toChunk2i(loc);
         final UUID world = loc.getExtent().getUniqueId();
 
-        final Map<Vector2i, PlotData> plots = this.map.get(world);
+        final Map<Vector2i, PlotData> plots = get(world);
 
         if (plots == null) {
             return Optional.empty();
@@ -127,7 +118,7 @@ public class SimplePlotService implements PlotService {
 
     @Override
     public void unclaim(UUID world, Predicate<PlotData> predicate) {
-        final Map<Vector2i, PlotData> plots = this.map.get(world);
+        final Map<Vector2i, PlotData> plots = get(world);
         if (plots != null) {
             final Iterator<Map.Entry<Vector2i, PlotData>> iterator = plots.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -252,6 +243,20 @@ public class SimplePlotService implements PlotService {
         Sponge.getEventManager().registerListeners(plugin, new InternalNotifyHandler(this));
         Sponge.getEventManager().registerListeners(plugin, new InternalLoginHandler(this));
         Sponge.getEventManager().registerListeners(plugin, new InternalSpawnEntityHandler(this));
+    }
+
+    @Nullable
+    public Map<Vector2i, PlotData> get(UUID world) {
+        return this.map.get(world);
+    }
+
+    @Nullable
+    public PlotData get(UUID world, Vector2i cp) {
+        final Map<Vector2i, PlotData> plots = get(world);
+        if (plots == null) {
+            return null;
+        }
+        return plots.get(cp);
     }
 
     @Nullable

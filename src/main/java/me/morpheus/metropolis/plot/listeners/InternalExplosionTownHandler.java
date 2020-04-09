@@ -17,6 +17,7 @@ import org.spongepowered.api.world.explosion.Explosion;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -52,9 +53,13 @@ public final class InternalExplosionTownHandler {
             return;
         }
 
+        final Map<Vector2i, PlotData> wm = this.ps.get(world);
+        if (wm == null) {
+            return;
+        }
         if (Stream.iterate(nw, v -> v.getX() < se.getX() ? v.add(Vector2i.UNIT_X) : Vector2i.from(nw.getX(), v.getY() + 1))
                 .limit((se.getX() - nw.getX()) * (se.getY() * nw.getY()))
-                .anyMatch(cp -> this.ps.get(world, cp) != null)) {
+                .anyMatch(cp -> wm.get(cp) != null)) {
                 event.setCancelled(true);
         }
     }
