@@ -327,13 +327,15 @@ public class MPTown implements Town {
         }
         list.add(Text.of(TextColors.DARK_GREEN, "Citizens: ", TextColors.GREEN, "[", this.citizens, "/", this.type.getMaxCitizens(), "]"));
         final Text.Builder hoverBuilder = Text.builder();
+        short total = 0;
         for (Reference2ShortMap.Entry<PlotType> entry : this.plots.reference2ShortEntrySet()) {
             hoverBuilder
                     .append(Text.of(TextColors.DARK_GREEN, entry.getKey().getName(), ":", TextColors.GREEN, " [", entry.getShortValue(), "/", this.type.getMaxPlots(entry.getKey()), "]"))
                     .append(Text.NEW_LINE);
+            total += entry.getShortValue();
         }
         final Text plots = Text.builder()
-                .append(Text.of(TextColors.DARK_GREEN, "Plots: ", TextColors.GREEN, "[...]"))
+                .append(Text.of(TextColors.DARK_GREEN, "Plots: ", TextColors.GREEN, total, " [...]"))
                 .onHover(TextActions.showText(hoverBuilder.build()))
                 .build();
         list.add(plots);
