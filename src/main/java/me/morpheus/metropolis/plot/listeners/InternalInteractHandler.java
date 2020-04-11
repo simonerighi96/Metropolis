@@ -20,6 +20,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.entity.BreedEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
@@ -94,6 +95,10 @@ public final class InternalInteractHandler {
         final Optional<PlotData> pdOpt = this.ps.get(entity.getLocation());
 
         if (!pdOpt.isPresent()) {
+            return;
+        }
+
+        if (event instanceof BreedEntityEvent) {
             return;
         }
 
