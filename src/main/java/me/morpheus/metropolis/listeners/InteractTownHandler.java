@@ -1,6 +1,7 @@
 package me.morpheus.metropolis.listeners;
 
 import me.morpheus.metropolis.api.data.plot.PlotData;
+import me.morpheus.metropolis.api.data.plot.PlotKeys;
 import me.morpheus.metropolis.api.event.block.InteractBlockTownEvent;
 import me.morpheus.metropolis.api.event.entity.InteractEntityTownEvent;
 import me.morpheus.metropolis.api.event.item.inventory.InteractInventoryTownEvent;
@@ -8,13 +9,17 @@ import me.morpheus.metropolis.api.event.item.inventory.InteractItemTownEvent;
 import me.morpheus.metropolis.api.flag.Flag;
 import me.morpheus.metropolis.api.flag.Flags;
 import me.morpheus.metropolis.api.plot.PlotService;
+import me.morpheus.metropolis.api.town.Town;
+import me.morpheus.metropolis.api.town.TownService;
 import me.morpheus.metropolis.util.EventUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.manipulator.mutable.entity.TameableData;
 import org.spongepowered.api.data.property.item.SaturationProperty;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Hostile;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.EventContextKey;
@@ -106,7 +111,22 @@ public final class InteractTownHandler {
         if (entity instanceof Hostile) { //TODO
             return;
         }
-        onInteractEntity(event, Flags.INTERACT_ENTITY);
+        if (entity.getType() == EntityTypes.PLAYER && event.getCause().root() instanceof Player) { //TODO
+            final PlotService ps = Sponge.getServiceManager().provideUnchecked(PlotService.class);
+            final PlotData pd = ps.get(entity.getLocation()).get();
+            final TownService ts = Sponge.getServiceManager().provideUnchecked(TownService.class);
+            final Town t = ts.get(pd.town().get().intValue()).get();
+            if (!t.getPvP().canDamage((Player) event.getCause().root(), (Player) entity)) {
+                event.setCancelled(true);
+                EventUtil.sendNoPermissionMessage((Player) event.getCause().root());
+            }
+            return;
+        }
+        if (entity instanceof Living) {
+            onInteractEntity(event, Flags.DAMAGE);
+        } else {
+            onInteractEntity(event, Flags.INTERACT_ENTITY);
+        }
     }
 
     @Listener(beforeModifications = true)
