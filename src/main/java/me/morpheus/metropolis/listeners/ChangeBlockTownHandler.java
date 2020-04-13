@@ -38,9 +38,6 @@ public final class ChangeBlockTownHandler {
                             .isPresent());
             if (notAllowed) {
                 event.setCancelled(true);
-                if (source != null) {
-                    source.getPlayer().ifPresent(EventUtil::sendNoPermissionMessage);
-                }
             }
         } else {
             boolean notAllowed = event.getLocations().anyMatch(location ->
