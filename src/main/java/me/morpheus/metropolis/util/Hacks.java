@@ -3,12 +3,14 @@ package me.morpheus.metropolis.util;
 import it.unimi.dsi.fastutil.objects.Reference2ByteMap;
 import it.unimi.dsi.fastutil.objects.Reference2ByteMaps;
 import it.unimi.dsi.fastutil.objects.Reference2ByteOpenHashMap;
+import me.morpheus.metropolis.api.data.citizen.CitizenKeys;
 import me.morpheus.metropolis.api.data.town.TownKeys;
 import me.morpheus.metropolis.api.flag.Flag;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
@@ -19,11 +21,15 @@ import org.spongepowered.api.world.World;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 public final class Hacks {
 
@@ -113,6 +119,19 @@ public final class Hacks {
             permissions.put(flag, value);
         }
         return permissions;
+    }
+
+    public static Set<UUID> friendsFrom(DataContainer container) {
+        Optional<List<?>> list = container.getList(CitizenKeys.FRIENDS.getQuery());
+        if (!list.isPresent()) {
+            return Collections.emptySet();
+        }
+        Set<UUID> friends = new HashSet<>(list.get().size());
+        for (Object f : list.get()) {
+            Optional<UUID> uuidOptional = ((DataView) f).getObject(DataQuery.of(), UUID.class);
+            uuidOptional.ifPresent(friends::add);
+        }
+        return friends;
     }
 
     private Hacks() {}

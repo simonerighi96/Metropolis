@@ -6,6 +6,7 @@ import me.morpheus.metropolis.api.data.citizen.ImmutableCitizenData;
 import me.morpheus.metropolis.api.rank.Rank;
 import me.morpheus.metropolis.api.rank.Ranks;
 import me.morpheus.metropolis.data.DataVersions;
+import me.morpheus.metropolis.util.Hacks;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -16,7 +17,9 @@ import org.spongepowered.api.data.value.mutable.Value;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -86,13 +89,15 @@ public class MPCitizenData extends AbstractData<CitizenData, ImmutableCitizenDat
         if (!rank.isPresent()) {
             return Optional.empty();
         }
-        Optional<Set> friends = container.getObject(CitizenKeys.FRIENDS.getQuery(), Set.class);
+        Set<UUID> friends = Hacks.friendsFrom(container);
         Optional<Instant> joined = container.getObject(CitizenKeys.JOINED.getQuery(), Instant.class);
         Optional<Boolean> chat = container.getBoolean(CitizenKeys.CHAT.getQuery());
 
         this.town = town.get();
         this.rank = rank.get();
-        friends.ifPresent(set -> this.friends = set);
+        if (!friends.isEmpty()) {
+            this.friends = friends;
+        }
         this.joined = joined.orElse(Instant.now());
         this.chat = chat.orElse(false);
         return Optional.of(this);
