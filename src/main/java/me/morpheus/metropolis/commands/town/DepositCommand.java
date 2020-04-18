@@ -47,6 +47,10 @@ public class DepositCommand extends AbstractCitizenCommand {
         }
 
         final BigDecimal amount = context.requireOne("amount");
+        if (amount.compareTo(BigDecimal.ZERO) < 1) {
+            source.sendMessage(TextUtil.watermark(TextColors.RED, "Expected a positive amount, but input ", amount, " was not"));
+            return CommandResult.empty();
+        }
         final EconomyService es = Sponge.getServiceManager().provideUnchecked(EconomyService.class);
 
         final Optional<Account> accOpt = es.getOrCreateAccount(source.getIdentifier());
