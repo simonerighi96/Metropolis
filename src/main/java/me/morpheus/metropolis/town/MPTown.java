@@ -77,6 +77,7 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.transaction.ResultType;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -362,13 +363,14 @@ public class MPTown implements Town {
             return true;
         }
 
+        if (receiver instanceof Subject) {
+            if (((Subject) receiver).hasPermission(Metropolis.ID + ".admin.town.view.spawn")) {
+                return true;
+            }
+        }
         if (receiver instanceof Player) {
             final Optional<CitizenData> cdOpt = ((Player) receiver).get(CitizenData.class);
             return cdOpt.isPresent() && cdOpt.get().town().get().intValue() == this.id;
-        }
-
-        if (receiver instanceof ConsoleSource) {
-            return true;
         }
 
         return false;
