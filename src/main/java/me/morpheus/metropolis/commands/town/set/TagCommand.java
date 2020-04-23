@@ -18,6 +18,7 @@ import org.spongepowered.api.command.args.parsing.InputTokenizer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.Optional;
 
@@ -25,7 +26,7 @@ class TagCommand extends AbstractCitizenCommand {
 
     TagCommand() {
         super(
-                GenericArguments.onlyOne(GenericArguments.string(Text.of("tag"))),
+                GenericArguments.onlyOne(GenericArguments.text(Text.of("tag"), TextSerializers.FORMATTING_CODE, false)),
                 MinimalInputTokenizer.INSTANCE,
                 Metropolis.ID + ".commands.town.set.tag",
                 Text.of()
@@ -34,23 +35,24 @@ class TagCommand extends AbstractCitizenCommand {
 
     @Override
     public CommandResult process(Player source, CommandContext context, CitizenData cd, Town t) throws CommandException {
-        final String tag = context.requireOne("tag");
+        final Text tag = context.requireOne("tag");
+        final String plain = tag.toPlain();
 
         final TownCategory townCategory = Sponge.getServiceManager().provideUnchecked(ConfigService.class).getGlobal().getTownCategory();
 
         final byte tagMaxLength = townCategory.getTagMaxLength();
-        if (tag.length() > tagMaxLength) {
+        if (plain.length() > tagMaxLength) {
             source.sendMessage(TextUtil.watermark(TextColors.RED, "Tag can't be longer than ", tagMaxLength, " char"));
             return CommandResult.empty();
         }
 
         final byte tagMinLength = townCategory.getTagMinLength();
-        if (tag.length() < tagMinLength) {
+        if (plain.length() < tagMinLength) {
             source.sendMessage(TextUtil.watermark(TextColors.RED, "Tag can't be shorter than ", tagMinLength, " char"));
             return CommandResult.empty();
         }
 
-        t.setTag(Text.of(tag));
+        t.setTag(tag);
         t.sendMessage(Text.of("Town tag set to ", tag));
 
         return CommandResult.success();
