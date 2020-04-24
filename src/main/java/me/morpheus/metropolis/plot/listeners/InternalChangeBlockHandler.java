@@ -24,20 +24,9 @@ public final class InternalChangeBlockHandler {
 
     @Listener(order = Order.FIRST, beforeModifications = true)
     public void onBlockPre(ChangeBlockEvent.Pre event) {
-        final Object root = event.getCause().root();
-
-//        if (event.getCause().getContext().asMap().isEmpty() && event.getCause().all().size() == 1
-//                && root instanceof LocatableBlock) { //TODO Sponge ? Wtf ?
-//            final List<Location<World>> locations = event.getLocations();
-//            final long count = locations.stream().filter(l -> this.ps.get(((LocatableBlock) root).getLocation()).isPresent()).count();
-//            if (count != 0L && count != locations.size()) {
-//                System.err.println(event.getLocations());
-//                System.err.println(event.getCause().all());
-//                event.setCancelled(true);
-//            }
-//            return;
-//        }
-
+        if (event.getContext().containsKey(EventContextKeys.LEAVES_DECAY)) {
+            return;
+        }
         if (event.getLocations().stream().anyMatch(location -> this.ps.get(location).isPresent())) {
             ChangeBlockTownEvent.Pre townEvent = new MPChangeBlockTownEventPre(event.getCause(), event.getLocations());
             if (Sponge.getEventManager().post(townEvent)) {
