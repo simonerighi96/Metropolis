@@ -3,6 +3,7 @@ package me.morpheus.metropolis.plot;
 import com.flowpowered.math.vector.Vector2i;
 import me.morpheus.metropolis.MPLog;
 import me.morpheus.metropolis.Metropolis;
+import me.morpheus.metropolis.api.command.CommandDispatcher;
 import me.morpheus.metropolis.api.config.ConfigService;
 import me.morpheus.metropolis.api.config.GlobalConfig;
 import me.morpheus.metropolis.api.data.citizen.CitizenData;
@@ -12,6 +13,7 @@ import me.morpheus.metropolis.api.plot.PlotService;
 import me.morpheus.metropolis.api.rank.Rank;
 import me.morpheus.metropolis.api.town.Town;
 import me.morpheus.metropolis.config.ConfigUtil;
+import me.morpheus.metropolis.plot.commands.IgnoreClaimCommand;
 import me.morpheus.metropolis.plot.listeners.InternalChangeBlockHandler;
 import me.morpheus.metropolis.plot.listeners.InternalClaimHandler;
 import me.morpheus.metropolis.plot.listeners.InternalDamageEntityHandler;
@@ -23,6 +25,7 @@ import me.morpheus.metropolis.plot.listeners.InternalNotifyHandler;
 import me.morpheus.metropolis.plot.listeners.InternalSpawnEntityHandler;
 import me.morpheus.metropolis.util.VectorUtil;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -57,6 +60,7 @@ public final class SimplePlotService implements PlotService {
 
     private final Map<UUID, Map<Vector2i, Plot>> map = new HashMap<>();
     private final Map<UUID, Set<Vector2i>> deleted = new HashMap<>();
+    private final Set<UUID> ignoreClaims = new HashSet<>();
     private boolean loaded = false;
 
     private static final Path PLOT_DATA = ConfigUtil.DATA.resolve("plot");
@@ -150,6 +154,9 @@ public final class SimplePlotService implements PlotService {
 
     @Override
     public boolean hasPermission(User source, CitizenData cd, Plot plot, Flag flag) {
+        if (!this.ignoreClaims.isEmpty() && this.ignoreClaims.contains(source.getUniqueId())) {
+            return true;
+        }
         if (plot.getTown() != cd.town().get().intValue()) {
             return false;
         }
@@ -314,6 +321,12 @@ public final class SimplePlotService implements PlotService {
         Sponge.getEventManager().registerListeners(plugin, new InternalSpawnEntityHandler(this));
     }
 
+    @Override
+    public void registerCommands() {
+        final CommandMapping cm = Sponge.getCommandManager().get("mpadmin").get();
+        ((CommandDispatcher) cm.getCallable()).register(new IgnoreClaimCommand(this), "ignoreclaims");
+    }
+
     @Nullable
     public Map<Vector2i, Plot> get(UUID world) {
         return this.map.get(world);
@@ -336,5 +349,9 @@ public final class SimplePlotService implements PlotService {
 
     public boolean isReady() {
         return this.loaded;
+    }
+
+    public Set<UUID> getIgnoreClaims() {
+        return this.ignoreClaims;
     }
 }

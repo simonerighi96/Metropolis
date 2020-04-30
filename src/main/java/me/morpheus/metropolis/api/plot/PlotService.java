@@ -41,4 +41,6 @@ public interface PlotService {
 
     void registerListeners();
 
+    void registerCommands();
+
 }
