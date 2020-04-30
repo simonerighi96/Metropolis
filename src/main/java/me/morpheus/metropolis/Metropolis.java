@@ -323,6 +323,8 @@ public class Metropolis {
         final CommandDispatcher mpadmin = new AdminDispatcher();
         mpadmin.registerDefaults();
         Sponge.getCommandManager().register(this.container, mpadmin, "mpadmin");
+
+        Sponge.getServiceManager().provideUnchecked(PlotService.class).registerCommands();
     }
 
     private void registerDebugCommands() {
