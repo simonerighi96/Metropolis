@@ -148,6 +148,9 @@ public final class SimplePlotService implements PlotService {
 
     @Override
     public boolean hasPermission(User source, Plot plot, Flag flag) {
+        if (!this.ignoreClaims.isEmpty() && this.ignoreClaims.contains(source.getUniqueId())) {
+            return true;
+        }
         final Optional<CitizenData> cdOpt = source.get(CitizenData.class);
         return cdOpt.isPresent() && hasPermission(source, cdOpt.get(), plot, flag);
     }
