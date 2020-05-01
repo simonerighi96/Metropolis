@@ -2,6 +2,7 @@ package me.morpheus.metropolis.plot.commands;
 
 import me.morpheus.metropolis.Metropolis;
 import me.morpheus.metropolis.api.command.AbstractCitizenCommand;
+import me.morpheus.metropolis.api.command.AbstractPlayerCommand;
 import me.morpheus.metropolis.api.command.args.parsing.MinimalInputTokenizer;
 import me.morpheus.metropolis.api.data.citizen.CitizenData;
 import me.morpheus.metropolis.api.town.Town;
@@ -15,7 +16,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-public class IgnoreClaimCommand extends AbstractCitizenCommand {
+public class IgnoreClaimCommand extends AbstractPlayerCommand {
 
     private final SimplePlotService ps;
 
@@ -30,7 +31,7 @@ public class IgnoreClaimCommand extends AbstractCitizenCommand {
     }
 
     @Override
-    public CommandResult process(Player source, CommandContext context, CitizenData cd, Town t) throws CommandException {
+    public CommandResult process(Player source, CommandContext context) throws CommandException {
         final Boolean toggle = context.requireOne("toggle");
         if (toggle.booleanValue()) {
             if (this.ps.getIgnoreClaims().add(source.getUniqueId())) {
